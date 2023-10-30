@@ -13,5 +13,5 @@ func findKthLargest(nums []int, k int) int {
 		nums[j+1] = v
 	}
 
-	return nums[k]
+	return nums[k-1]
 }
