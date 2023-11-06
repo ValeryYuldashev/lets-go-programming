@@ -16,8 +16,7 @@ func main() {
 	n, err := strconv.Atoi(os.Args[len(os.Args)-1])
 
 	if err != nil {
-		log.Error(err)
-		return
+		log.Fatal(err)
 	}
 
 	log.Info(calc.Calculate(int64(n), *logFlag))
