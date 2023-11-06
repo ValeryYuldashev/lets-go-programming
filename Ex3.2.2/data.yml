@@ -1,0 +1,7 @@
+files:
+  - filename: files/test1.txt
+    substring: data
+  - filename: files/test2.txt
+    substring: text
+  - filename: files/test3.txt
+    substring: abcdefg

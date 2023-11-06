@@ -1,0 +1,6 @@
+# github.com/ValeryYuldashev/substringFinder v0.0.0-20231106140848-787a6ba7acfa
+## explicit; go 1.21.3
+github.com/ValeryYuldashev/substringFinder/pkg
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3
