@@ -1,0 +1,12 @@
+mode: set
+example_mock/internal/wifi/wi-fi.go:17.33,19.2 1 0
+example_mock/internal/wifi/wi-fi.go:21.71,23.16 2 1
+example_mock/internal/wifi/wi-fi.go:23.16,25.3 1 1
+example_mock/internal/wifi/wi-fi.go:26.2,28.35 2 1
+example_mock/internal/wifi/wi-fi.go:28.35,30.3 1 1
+example_mock/internal/wifi/wi-fi.go:32.2,32.19 1 1
+example_mock/internal/wifi/wi-fi.go:35.57,37.16 2 1
+example_mock/internal/wifi/wi-fi.go:37.16,39.3 1 1
+example_mock/internal/wifi/wi-fi.go:40.2,42.35 2 1
+example_mock/internal/wifi/wi-fi.go:42.35,44.3 1 1
+example_mock/internal/wifi/wi-fi.go:45.2,45.23 1 1
