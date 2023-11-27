@@ -9,12 +9,16 @@ import (
 
 func Work(id int, channel chan bool, mutex *sync.Mutex, stats *statistics.Stats) {
 
-	for stats.Count < stats.Max {
+	for {
 		mutex.Lock()
+		if stats.Count >= stats.Max {
+			mutex.Unlock()
+			break
+		}
 		stats.Count++
-		fmt.Println(id, ": ", stats.Count)
+		fmt.Printf("%d: %d\n", id, stats.Count)
 		mutex.Unlock()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 	channel <- true
 }

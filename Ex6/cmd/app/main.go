@@ -3,14 +3,15 @@ package main
 import (
 	"ex6/internal/statistics"
 	"ex6/internal/turnstile"
+	"fmt"
 	"sync"
 )
 
 func main() {
 	var metroStatistics statistics.Stats
 
-	metroStatistics.Max = 80
-	metroStatistics.NumberOfTurnstile = 8
+	metroStatistics.Max = 30
+	metroStatistics.NumberOfTurnstile = 15
 
 	channel := make(chan bool)
 	var mutex sync.Mutex
@@ -21,4 +22,6 @@ func main() {
 	for i := 0; i < metroStatistics.NumberOfTurnstile; i++ {
 		<-channel
 	}
+
+	fmt.Printf("Количество человек: %d", metroStatistics.Count)
 }
