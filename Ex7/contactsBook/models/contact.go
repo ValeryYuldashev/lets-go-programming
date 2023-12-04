@@ -2,7 +2,7 @@ package models
 
 import (
 	u "contactsBook/utils"
-	"fmt"
+	"strings"
 	"unicode"
 
 	"github.com/jinzhu/gorm"
@@ -18,27 +18,31 @@ type Contact struct {
 func (contact *Contact) ValidateContact() (map[string]interface{}, bool) {
 
 	if contact.Name == "" {
-		return u.Message(false, "Name cannot be empty!"), false
+		return u.ErrorMessage(false, "Name cannot be empty!", 400), false
 	}
 
 	if contact.Phone == "" {
-		return u.Message(false, "Phone number cannot be empty!"), false
+		return u.ErrorMessage(false, "Phone number cannot be empty!", 400), false
 	}
 
 	for _, v := range contact.Name {
 		if unicode.IsDigit(v) {
-			return u.Message(false, "Invalid name!"), false
+			return u.ErrorMessage(false, "Invalid name!", 400), false
 		}
 	}
 
 	for _, v := range contact.Phone {
 		if !unicode.IsDigit(v) {
-			return u.Message(false, "Invalid phone number!"), false
+			return u.ErrorMessage(false, "Invalid phone number!", 400), false
 		}
 	}
 
+	if strings.Contains(contact.Phone, "+") {
+		return u.ErrorMessage(false, "Invalid phone number!", 400), false
+	}
+
 	if len(contact.Phone) != 11 {
-		return u.Message(false, "Phone number cannot be empty!"), false
+		return u.ErrorMessage(false, "The length of the phone number must be 11!", 400), false
 	}
 
 	return u.Message(true, "Check is passed!"), true
@@ -67,24 +71,22 @@ func GetContact(id uint) *Contact {
 	return contact
 }
 
-func GetContacts(user uint) []*Contact {
+func GetContacts(user uint) ([]*Contact, map[string]interface{}) {
 
 	contactsSlice := make([]*Contact, 0)
 	err := GetDB().Table("contacts").Where("user_id = ?", user).Find(&contactsSlice).Error
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return nil, u.ErrorMessage(false, "Bad request!", 400)
 	}
 
-	return contactsSlice
+	return contactsSlice, u.Message(true, "Contacts received.")
 }
 
 func UpdateContatct(id uint, data Contact) map[string]interface{} {
 	contact := &Contact{}
 	err := GetDB().Table("contacts").Where("id = ?", id).First(contact).Error
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return u.ErrorMessage(false, "Bad request!", 400)
 	}
 
 	contact.Phone = data.Phone
@@ -106,8 +108,7 @@ func DeleteContact(id uint) map[string]interface{} {
 	contact := &Contact{}
 	err := GetDB().Table("contacts").Where("id = ?", id).First(contact).Error
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return u.ErrorMessage(false, "Bad request!", 400)
 	}
 
 	GetDB().Delete(contact).Where("id = ?", id)

@@ -11,7 +11,7 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 	account := &models.Account{}
 	err := json.NewDecoder(r.Body).Decode(account)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request!"))
+		u.Respond(w, u.ErrorMessage(false, "Bad request", 400))
 		return
 	}
 	resp := account.CreateAccount()
@@ -22,7 +22,7 @@ var LoginAccount = func(w http.ResponseWriter, r *http.Request) {
 	account := &models.Account{}
 	err := json.NewDecoder(r.Body).Decode(account)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request!"))
+		u.Respond(w, u.ErrorMessage(false, "Bad request", 400))
 		return
 	}
 	resp := models.LoginAccount(account.Email, account.Password)
@@ -33,7 +33,7 @@ var UpdateAccount = func(w http.ResponseWriter, r *http.Request) {
 	account := &models.Account{}
 	err := json.NewDecoder(r.Body).Decode(account)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request!"))
+		u.Respond(w, u.ErrorMessage(false, "Bad request", 400))
 		return
 	}
 	id := r.Context().Value("user").(uint)

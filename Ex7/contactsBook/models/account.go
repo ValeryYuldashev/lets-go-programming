@@ -32,10 +32,10 @@ func (account *Account) Validate() (map[string]interface{}, bool) {
 
 	err := GetDB().Table("accounts").Where("email = ?", account.Email).First(acc).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return u.Message(false, "Connection error!, Error: "+err.Error()), false
+		return u.ErrorMessage(false, "Connection error!, Error: "+err.Error(), 500), false
 	}
 	if acc.Email != "" {
-		return u.Message(false, "The email is already occupied by another user!"), false
+		return u.ErrorMessage(false, "The email is already occupied by another user!", 400), false
 	}
 
 	return u.Message(false, "Check is passed!"), true
@@ -43,12 +43,12 @@ func (account *Account) Validate() (map[string]interface{}, bool) {
 
 func (account *Account) ValidateData() (map[string]interface{}, bool) {
 
-	if !strings.Contains(account.Email, "@") {
-		return u.Message(false, "Email address is not valid!"), false
+	if !strings.Contains(account.Email, "@") || !strings.Contains(account.Email, ".") {
+		return u.ErrorMessage(false, "Email address is not valid!", 400), false
 	}
 
 	if len(account.Password) < 4 {
-		return u.Message(false, "Password must be longer then 4 symbols"), false
+		return u.ErrorMessage(false, "Password must be longer then 4 symbols", 400), false
 	}
 
 	return u.Message(false, "Check is passed!"), true
@@ -66,7 +66,7 @@ func (account *Account) CreateAccount() map[string]interface{} {
 	GetDB().Create(account)
 
 	if account.ID <= 0 {
-		return u.Message(false, "Failed to create account, connection error.")
+		return u.ErrorMessage(false, "Failed to create account, connection error.", 500)
 	}
 
 	tk := &Token{UserId: account.ID}
@@ -87,14 +87,14 @@ func LoginAccount(email, password string) map[string]interface{} {
 	err := GetDB().Table("accounts").Where("email = ?", email).First(account).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Email address not found")
+			return u.ErrorMessage(false, "Email address not found", 400)
 		}
-		return u.Message(false, "Connection error. Please retry")
+		return u.ErrorMessage(false, "Connection error. Please retry", 500)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return u.Message(false, "Password does not match!")
+		return u.ErrorMessage(false, "Password does not match!", 400)
 	}
 
 	account.Password = ""
@@ -115,9 +115,9 @@ func UpdateAccount(id uint, email, password string) map[string]interface{} {
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Account id not found")
+			return u.ErrorMessage(false, "Account id not found", 400)
 		}
-		return u.Message(false, "Connection error. Please retry")
+		return u.ErrorMessage(false, "Connection error. Please retry", 500)
 	}
 	account.Email = email
 	account.Password = password
@@ -147,9 +147,9 @@ func DeleteAccount(id uint) map[string]interface{} {
 	err := GetDB().Table("accounts").Where("id = ?", id).First(account).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Account id not found")
+			return u.ErrorMessage(false, "Account id not found", 400)
 		}
-		return u.Message(false, "Connection error. Please retry")
+		return u.ErrorMessage(false, "Connection error. Please retry", 500)
 	}
 
 	GetDB().Delete(account).Where("id = ", id)
@@ -158,14 +158,14 @@ func DeleteAccount(id uint) map[string]interface{} {
 	return resp
 }
 
-func GetUser(u uint) *Account {
+func GetUser(user uint) (*Account, map[string]interface{}) {
 
 	acc := &Account{}
-	GetDB().Table("accounts").Where("id = ?", u).First(acc)
-	if acc.Email == "" { //User not found!
-		return nil
+	GetDB().Table("accounts").Where("id = ?", user).First(acc)
+	if acc.Email == "" {
+		return nil, u.ErrorMessage(false, "User not found!", 400)
 	}
 
 	acc.Password = ""
-	return acc
+	return acc, u.Message(true, "Success")
 }

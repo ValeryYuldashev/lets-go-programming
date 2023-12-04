@@ -14,7 +14,7 @@ var CreateContact = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(contact)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error!"))
+		u.Respond(w, u.ErrorMessage(false, "Bad request", 400))
 		return
 	}
 
@@ -26,8 +26,7 @@ var CreateContact = func(w http.ResponseWriter, r *http.Request) {
 var GetContacts = func(w http.ResponseWriter, r *http.Request) {
 
 	id := r.Context().Value("user").(uint)
-	data := models.GetContacts(id)
-	resp := u.Message(true, "success")
+	data, resp := models.GetContacts(id)
 	resp["data"] = data
 	u.Respond(w, resp)
 }
@@ -41,7 +40,7 @@ var UpdateContact = func(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(data)
 
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request!"))
+		u.Respond(w, u.ErrorMessage(false, "Bad request", 400))
 		return
 	}
 
@@ -56,7 +55,7 @@ var DeleteContact = func(w http.ResponseWriter, r *http.Request) {
 	data := &Body{}
 	err := json.NewDecoder(r.Body).Decode(data)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request!"))
+		u.Respond(w, u.ErrorMessage(false, "Bad request", 400))
 		return
 	}
 	resp := models.DeleteContact(data.ID)
